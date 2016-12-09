@@ -75,6 +75,12 @@ public class VungleRewardedVideo extends CustomEventRewardedVideo {
     protected String getAdNetworkId() {
         return VUNGLE_AD_NETWORK_CONSTANT;
     }
+	
+	protected void resetListeners(){
+		//	Because Interstital / Rewarded can be loaded at same time, override listener when executing calls on a specific ad type
+		//	Otherwise MoPub will get confused and will stop showing rewarded videos in this session
+		sVunglePub.setEventListeners(sVungleListener);
+	}
 
     @Override
     protected boolean checkAndInitializeSdk(@NonNull final Activity launcherActivity,
@@ -94,7 +100,9 @@ public class VungleRewardedVideo extends CustomEventRewardedVideo {
     protected void loadWithSdkInitialized(@NonNull final Activity activity, @NonNull final Map<String, Object> localExtras, @NonNull final Map<String, String> serverExtras) throws Exception {
         String appId = serverExtras.containsKey(APP_ID_KEY) ? serverExtras.get(APP_ID_KEY) : DEFAULT_VUNGLE_APP_ID;
         sVunglePub.init(activity, appId);
-        sVunglePub.setEventListeners(sVungleListener);
+        
+		resetListeners();
+		
         Object adUnitObject = localExtras.get(DataKeys.AD_UNIT_ID_KEY);
         if (adUnitObject instanceof String) {
             mAdUnitId = (String) adUnitObject;
@@ -123,6 +131,8 @@ public class VungleRewardedVideo extends CustomEventRewardedVideo {
 
     @Override
     protected void showVideo() {
+		resetListeners();
+		
         final AdConfig adConfig = new AdConfig();
         adConfig.setIncentivized(true);
         setUpMediationSettingsForRequest(adConfig);

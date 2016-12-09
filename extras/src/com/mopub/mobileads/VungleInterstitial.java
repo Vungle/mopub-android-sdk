@@ -56,7 +56,9 @@ public class VungleInterstitial extends CustomEventInterstitial implements Event
 
         // init clears the event listener.
         mVunglePub.init(context, appId);
-        mVunglePub.setEventListeners(this);
+        
+		resetListeners();
+		
         if (mVunglePub.isAdPlayable()) {
             Log.d("MoPub", "Vungle interstitial ad successfully loaded.");
             mCustomEventInterstitialListener.onInterstitialLoaded();
@@ -65,9 +67,17 @@ public class VungleInterstitial extends CustomEventInterstitial implements Event
             mCustomEventInterstitialListener.onInterstitialFailed(MoPubErrorCode.NETWORK_NO_FILL);
         }
     }
+	
+	protected void resetListeners(){
+		//	Because Interstital / Rewarded can be loaded at same time, override listener when executing calls on a specific ad type
+		//	Otherwise MoPub will get confused and will stop showing rewarded videos in this session
+		mVunglePub.setEventListeners(this);
+	}
 
     @Override
     protected void showInterstitial() {
+		resetListeners();
+		
         if (mVunglePub.isAdPlayable()) {
             mVunglePub.playAd();
         } else {
