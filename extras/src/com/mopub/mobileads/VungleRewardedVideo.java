@@ -39,6 +39,8 @@ public class VungleRewardedVideo extends CustomEventRewardedVideo {
     public static final String PLACEMENT_ID_KEY = "pid";
     public static final String PLACEMENT_IDS_KEY = "pids";
 
+    public static final String VUNGLE_NETWORK_ID_DEFAULT = "vngl_id";
+
     // Version of the adapter, intended for Vungle internal use.
     private static final String VERSION = "5.0.0";
 
@@ -116,6 +118,7 @@ public class VungleRewardedVideo extends CustomEventRewardedVideo {
         mIsPlaying = false;
 
         if (!validateIdsInServerExtras(serverExtras)) {
+            mPlacementId = VUNGLE_NETWORK_ID_DEFAULT;
             MoPubRewardedVideoManager.onRewardedVideoLoadFailure(VungleRewardedVideo.class, mPlacementId, MoPubErrorCode.ADAPTER_CONFIGURATION_ERROR);
 
             return;
